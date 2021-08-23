@@ -3,9 +3,11 @@ KERNEL := kernel.elf
 
 # Use our cross-compiling toolchain
 CC = x86_64-elf-g++
+AS = nasm
 LD = x86_64-elf-ld
 
 CXXFLAGS = -Wall -Wextra -O2 -pipe
+ASMFLAGS = -f elf64
 LDFLAGS =
 
 INTERNALLDFLAGS :=         \
@@ -21,7 +23,8 @@ INTERNALCXXFLAGS  :=       \
 	-I.                    \
 	-ffreestanding         \
 	-fno-stack-protector   \
-	-fno-pic -fpie         \
+	-fno-pic               \
+	-fpie                  \
 	-fno-exceptions        \
 	-fno-rtti              \
 	-mno-80387             \
@@ -32,11 +35,12 @@ INTERNALCXXFLAGS  :=       \
 	-mno-red-zone
 
 
-# List our .cpp files
+# List our .cpp and .asm files
 CXXFILES := $(shell find ./ -type f -name '*.cpp')
+ASMFILES := $(shell find ./ -type f -name '*.asm')
 
 # Compile each source file
-OBJ := $(CXXFILES:.cpp=.o)
+OBJ := $(CXXFILES:.cpp=.o) $(ASMFILES:.asm=.o)
 
 .PHONY: all clean
 
@@ -50,6 +54,9 @@ $(KERNEL): $(OBJ)
 
 %.o: %.cpp stivale2.h
 	$(CC) $(CXXFLAGS) $(INTERNALCXXFLAGS) -c $< -o $@
+
+%.o: %.asm
+	$(AS) $(ASMFLAGS) $< -o $@
 
 clean:
 	rm -rf $(KERNEL) $(OBJ)

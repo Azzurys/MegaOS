@@ -2,6 +2,7 @@
 #include <stddef.h>
 
 #include <stivale2.h>
+#include <arch/x64/gdt.hpp>
 
 
 constexpr auto KERNEL_STACK_SIZE = 8192u;
@@ -76,26 +77,14 @@ void _start(stivale2_struct* boot_info)
     void *term_write_ptr = (void*)term_tag->term_write;
     auto term_write = reinterpret_cast<TermWriteFunc>(term_write_ptr);
 
-    term_write("Mega OS", 8);
+    term_write("Mega OS\n", 9);
+
+    term_write("Installing GDT...\n", 19);
+    GDT::install();
+    term_write("GDT successfully installed !\n", 30);
 
     halt();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
