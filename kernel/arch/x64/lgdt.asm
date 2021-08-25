@@ -12,13 +12,13 @@ asm_lgdt:
     mov gs, ax
     mov ss, ax
 
+    ; push the segment value
+    ; push the return address
+    ; retfq will pop both in cs:rip
     pop rdi
     mov rax, 0x28
     push rax
     push rdi
     retfq
-
-.reload_cs:
-    ret
 
 

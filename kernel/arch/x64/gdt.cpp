@@ -1,7 +1,10 @@
-#include "gdt.hpp"
+#include <arch/x64/gdt.hpp>
 
 
-void GDT::make_entry(uint8_t entry_index, uint8_t access, uint8_t flags, uint32_t limit)
+GDT::gdt_entry GDT::table[ENTRY_COUNT] {};
+bool GDT::installed = false;
+
+void GDT::make_entry(gdt_entry_vec entry_index, uint8_t access, uint8_t flags, uint16_t limit)
 {
     if (entry_index >= ENTRY_COUNT)
         return;
@@ -12,6 +15,8 @@ void GDT::make_entry(uint8_t entry_index, uint8_t access, uint8_t flags, uint32_
     entry.base2 = 0;
     entry.base3 = 0;
 
+    // limit parameter is only on 16-bits since
+    // the 4 remaining bits are stored in flags
     entry.limit = limit;
     entry.access = access;
     entry.flags = flags;
@@ -19,38 +24,34 @@ void GDT::make_entry(uint8_t entry_index, uint8_t access, uint8_t flags, uint32_
 
 void GDT::install()
 {
+    if (installed)
+        return;
 
-    // See https://wiki.osdev.org/Global_Descriptor_Table for precisions on bitfields
-    // Only the privilege bits change depending to segment
-    // Kernel has ring 0 (highest) while User has ring 3 (lowest)
-    const uint8_t kern_access_bits = 0b10010010;
-    const uint8_t user_access_bits = 0b11110010;
+    constexpr auto cs_access_bits = SEG_PRESENT | SEG_DPL0 | SEG_TYPE_CODE | SEG_EXEC | SEG_READ;
+    constexpr auto ds_access_bits = SEG_PRESENT | SEG_DPL0 | SEG_TYPE_DATA | SEG_WRITE;
 
     /* define the mandatory null entry */
-    make_entry(0, 0, 0);
+    make_entry(NULL_ENT, 0, 0);
 
-    /* define the entry conforming the stivale2 spec */
-    make_entry(1, 0b10011010, 0, 0xFFFF);
-    make_entry(2, 0b10010010, 0, 0xFFFF);
-    make_entry(3, 0b10011010, 0b11001111);
-    make_entry(4, 0b10010010, 0b11001111);
-    make_entry(5, 0b10011010, 0b00100000);
-    make_entry(6, 0b10010010, 0);
+    /* define the entries conforming the stivale2 spec */
+    make_entry(_16BIT_CS, cs_access_bits, 0b00000000, 0xFFFF);
+    make_entry(_16BIT_DS, ds_access_bits, 0b00000000, 0xFFFF);
 
-    /* Set the exec bit as the entries describe code segments */
-    make_entry(KERN_CS, kern_access_bits | EXEC_BIT, 0x20);
-    make_entry(USER_CS, user_access_bits | EXEC_BIT, 0x20);
+    make_entry(_32BIT_CS, cs_access_bits, 0b11001111, 0xFFFF);
+    make_entry(_32BIT_DS, ds_access_bits, 0b11001111, 0xFFFF);
 
-    make_entry(KERN_DS, kern_access_bits, 0x20);
-    make_entry(USER_DS, user_access_bits, 0x20);
+    make_entry(_64BIT_CS, cs_access_bits, 0x20);
+    make_entry(_64BIT_DS, ds_access_bits, 0x0);
 
     /* tells the CPU where the GDT is */
     gdt_register desc_ptr {
-        .size = ENTRY_COUNT * sizeof(gdt_entry) - 1,
+        .size = entry_count() * sizeof(gdt_entry) - 1,
         .offset = (uint64_t)&table
     };
 
     asm_lgdt((uintptr_t)&desc_ptr);
+
+    installed = true;
 }
 
 
