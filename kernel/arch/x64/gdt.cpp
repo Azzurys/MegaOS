@@ -1,3 +1,4 @@
+#include <logging.hpp>
 #include <arch/x64/gdt.hpp>
 
 
@@ -27,6 +28,8 @@ void GDT::install()
     if (installed)
         return;
 
+    log::puts("Installing GDT...\n");
+
     constexpr auto cs_access_bits = SEG_PRESENT | SEG_DPL0 | SEG_TYPE_CODE | SEG_EXEC | SEG_READ;
     constexpr auto ds_access_bits = SEG_PRESENT | SEG_DPL0 | SEG_TYPE_DATA | SEG_WRITE;
 
@@ -45,11 +48,13 @@ void GDT::install()
 
     /* tells the CPU where the GDT is */
     gdt_register desc_ptr {
-        .size = entry_count() * sizeof(gdt_entry) - 1,
-        .offset = (uint64_t)&table
+        .size = size() - 1,
+        .base_addr = (uint64_t)&table
     };
 
     asm_lgdt((uintptr_t)&desc_ptr);
+
+    log::puts("GDT successfully installed !\n");
 
     installed = true;
 }

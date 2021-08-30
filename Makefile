@@ -1,11 +1,16 @@
 ISO_IMAGE = disk.iso
+GDB = gdb
 
 .PHONY: all run clean distclean
 
 all: $(ISO_IMAGE)
 
 run: $(ISO_IMAGE)
-	qemu-system-x86_64 -M q35 -m 2G -cdrom $(ISO_IMAGE)
+	qemu-system-x86_64 -M q35,smm=off -m 2G -cdrom $(ISO_IMAGE) -d int -no-reboot -no-shutdown 2> log.txt
+
+debug: $(ISO_IMAGE) kernel/kernel.elf
+	qemu-system-x86_64 -M q35 -m 2G -cdrom $(ISO_IMAGE) -s -S -d int -no-reboot -no-shutdown 2> log.txt & sleep 1
+	$(GDB) -ex "target remote localhost:1234" -ex "symbol-file kernel/kernel.elf"
 
 limine:
 	git clone https://github.com/limine-bootloader/limine.git --branch=v2.0-branch-binary --depth=1

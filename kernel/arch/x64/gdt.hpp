@@ -3,10 +3,11 @@
 
 
 #include <stdint.h>
+#include <utils.hpp>
 
 
 
-extern "C" void asm_lgdt(uintptr_t desc_ptr);
+ASM_DEFINED void asm_lgdt(uintptr_t desc_ptr);
 
 
 class GDT
@@ -19,15 +20,13 @@ class GDT
         uint8_t access;
         uint8_t flags;
         uint8_t base3;
-    } __attribute__((packed));
-
+    } PACKED;
 
     struct gdt_register
     {
         uint16_t size;
-        uint64_t offset;
-    } __attribute__((packed));
-
+        uint64_t base_addr;
+    } PACKED;
 
     enum gdt_entry_vec : uint8_t
     {
@@ -42,7 +41,6 @@ class GDT
         _64BIT_CS = 5,
         _64BIT_DS = 6,
     };
-
 
     enum gdt_access_bits : uint8_t
     {
@@ -83,7 +81,9 @@ class GDT
     static bool installed;
 
 public:
+    static constexpr uint16_t size() { return ENTRY_COUNT * sizeof(gdt_entry); }
     static constexpr uint8_t entry_count() { return ENTRY_COUNT; };
+    static constexpr uint8_t kernel_cs() { return gdt_entry_vec::_64BIT_CS * sizeof(gdt_entry); }
 
     static void install();
 

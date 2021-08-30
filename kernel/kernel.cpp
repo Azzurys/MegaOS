@@ -2,7 +2,11 @@
 #include <stddef.h>
 
 #include <stivale2.h>
+#include <logging.hpp>
+
 #include <arch/x64/gdt.hpp>
+#include <arch/x64/idt.hpp>
+#include <arch/x64/interrupts.hpp>
 
 
 constexpr auto KERNEL_STACK_SIZE = 8192u;
@@ -65,25 +69,35 @@ TagType* st2_get_tag(stivale2_struct* st2_struct, uint64_t tag_id)
     }
 }
 
-extern "C"
-void _start(stivale2_struct* boot_info)
+log::TTYWriteFunction get_write_function(stivale2_struct* boot_info)
 {
     const auto term_tag = st2_get_tag<stivale2_struct_tag_terminal>(boot_info, STIVALE2_STRUCT_TAG_TERMINAL_ID);
 
     if (term_tag == nullptr)
         halt();
 
-    using TermWriteFunc = void(*)(const char*, size_t);
-    void *term_write_ptr = (void*)term_tag->term_write;
-    auto term_write = reinterpret_cast<TermWriteFunc>(term_write_ptr);
+    return reinterpret_cast<log::TTYWriteFunction>((void*)term_tag->term_write);
+}
 
-    term_write("Mega OS\n", 9);
+extern "C"
+[[noreturn]] void _start(stivale2_struct* boot_info)
+{
+    const auto func = get_write_function(boot_info);
+    log::init(func);
 
-    term_write("Installing GDT...\n", 19);
+    log::printf("Mega OS - %s %s\n", boot_info->bootloader_brand, boot_info->bootloader_version);
+
     GDT::install();
-    term_write("GDT successfully installed !\n", 30);
+    IDT::install();
 
-    halt();
+    interrupts::enable();
+    log::puts("Interrupts enabled !\n");
+
+    __asm__ volatile("int $4");
+
+    log::puts("Hey\n");
+
+    while (true);
 }
 
 

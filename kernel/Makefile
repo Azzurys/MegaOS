@@ -7,7 +7,7 @@ AS = nasm
 LD = x86_64-elf-ld
 
 CXXFLAGS = -Wall -Wextra -O2 -pipe
-ASMFLAGS = -f elf64
+ASMFLAGS = -f elf64 -F dwarf -g
 LDFLAGS =
 
 INTERNALLDFLAGS :=         \
@@ -21,6 +21,7 @@ INTERNALLDFLAGS :=         \
 
 INTERNALCXXFLAGS  :=       \
 	-I.                    \
+	-ggdb                  \
 	-ffreestanding         \
 	-fno-stack-protector   \
 	-fno-pic               \

@@ -1,10 +1,11 @@
 bits 64
 
+
 global asm_lgdt
 asm_lgdt:
     lgdt [rdi]
 
-    ; reload segment selectors
+    ;reload segment selectors
     mov ax, 0x30
     mov ds, ax
     mov es, ax
@@ -16,9 +17,7 @@ asm_lgdt:
     ; push the return address
     ; retfq will pop both in cs:rip
     pop rdi
-    mov rax, 0x28
-    push rax
+    push 0x28
     push rdi
     retfq
-
 
