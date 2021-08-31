@@ -5,29 +5,16 @@
 #include <stdint.h>
 #include <utils.hpp>
 #include <logging.hpp>
+#include <arch/x64/cpu.hpp>
 
 
 namespace interrupts
 {
     struct interrupt_frame
     {
-        uint64_t r15;
-        uint64_t r14;
-        uint64_t r13;
-        uint64_t r12;
-        uint64_t r11;
-        uint64_t r10;
-        uint64_t r9;
-        uint64_t r8;
-        uint64_t rsi;
-        uint64_t rdi;
-        uint64_t rbp;
-        uint64_t rdx;
-        uint64_t rcx;
-        uint64_t rbx;
-        uint64_t rax;
-        uint64_t err_code;
+        cpu::registers GPRs;
         uint64_t int_no;
+        uint64_t err_code;
         uint64_t rip;
         uint64_t cs;
         uint64_t rflags;
@@ -80,10 +67,10 @@ namespace interrupts
     namespace isr
     {
         /* points to an array of handlers defined in ASM */
-        ASM_DEFINED void* handlers[];
+        ASM_DEFINED uintptr_t handlers[];
 
-        extern "C" __attribute__((interrupt))
-        void generic_handler(interrupt_frame* regs);
+        extern "C"
+        void cpu_exception_handler(interrupt_frame* frame);
     }
 }
 

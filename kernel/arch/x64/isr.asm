@@ -1,44 +1,43 @@
 bits 64
 
 
-; pushes all 64 bits registers
+; push 64 bit GPRs
 %macro pusha64 0
-    push rax
-    push rbx
-    push rcx
-    push rdx
-    push rbp
-    push rdi
-    push rsi
-    push r8
-    push r9
-    push r10
-    push r11
-    push r12
-    push r13
-    push r14
-    push r15
+push rax
+push rbx
+push rcx
+push rdx
+push rbp
+push rdi
+push rsi
+push r8
+push r9
+push r10
+push r11
+push r12
+push r13
+push r14
+push r15
 %endmacro
 
-; pops all 64 bits registers
+; pop 64 bit GPRs
 %macro popa64 0
-    pop r15
-    pop r14
-    pop r13
-    pop r12
-    pop r11
-    pop r10
-    pop r9
-    pop r8
-    pop rsi
-    pop rdi
-    pop rbp
-    pop rdx
-    pop rcx
-    pop rbx
-    pop rax
+pop r15
+pop r14
+pop r13
+pop r12
+pop r11
+pop r10
+pop r9
+pop r8
+pop rsi
+pop rdi
+pop rbp
+pop rdx
+pop rcx
+pop rbx
+pop rax
 %endmacro
-
 
 ; pushes interrupt number
 ; then jumps to the common code
@@ -61,20 +60,21 @@ isr_handler%+%1:
 
 section .text
 ; defined in interrupts.hpp
-extern generic_handler
+extern cpu_exception_handler
 
 ; common code that basically
 ; calls the generic handler
 handle_isr_common:
     ; sysv x86-64 abi requires the Direction Flags
     ; to be cleared upon function entry
+    ; see 6.2.2 about stack alignment in the Intel SDM volume 1
     cld
 
     pusha64
 
     ; pass the pushed registers to the handler
     mov rdi, rsp
-    call generic_handler
+    call cpu_exception_handler
 
     popa64
 
@@ -108,7 +108,7 @@ make_isr_err   17
 make_isr_noerr 18
 make_isr_noerr 19
 make_isr_noerr 20
-make_isr_err 21
+make_isr_err   21
 make_isr_noerr 22
 make_isr_noerr 23
 make_isr_noerr 24
@@ -117,7 +117,7 @@ make_isr_noerr 26
 make_isr_noerr 27
 make_isr_noerr 28
 make_isr_noerr 29
-make_isr_noerr 30
+make_isr_err   30
 make_isr_noerr 31
 
 

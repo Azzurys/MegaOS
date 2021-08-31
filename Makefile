@@ -9,7 +9,7 @@ run: $(ISO_IMAGE)
 	qemu-system-x86_64 -M q35,smm=off -m 2G -cdrom $(ISO_IMAGE) -d int -no-reboot -no-shutdown 2> log.txt
 
 debug: $(ISO_IMAGE) kernel/kernel.elf
-	qemu-system-x86_64 -M q35 -m 2G -cdrom $(ISO_IMAGE) -s -S -d int -no-reboot -no-shutdown 2> log.txt & sleep 1
+	qemu-system-x86_64 -M q35,smm=off -m 2G -cdrom $(ISO_IMAGE) -s -S -d int -no-reboot -no-shutdown 2> log.txt & sleep 1
 	$(GDB) -ex "target remote localhost:1234" -ex "symbol-file kernel/kernel.elf"
 
 limine:

@@ -28,8 +28,6 @@ void GDT::install()
     if (installed)
         return;
 
-    log::puts("Installing GDT...\n");
-
     constexpr auto cs_access_bits = SEG_PRESENT | SEG_DPL0 | SEG_TYPE_CODE | SEG_EXEC | SEG_READ;
     constexpr auto ds_access_bits = SEG_PRESENT | SEG_DPL0 | SEG_TYPE_DATA | SEG_WRITE;
 
@@ -47,14 +45,17 @@ void GDT::install()
     make_entry(_64BIT_DS, ds_access_bits, 0x0);
 
     /* tells the CPU where the GDT is */
-    gdt_register desc_ptr {
+    gdt_register gdt_ptr {
         .size = size() - 1,
         .base_addr = (uint64_t)&table
     };
 
-    asm_lgdt((uintptr_t)&desc_ptr);
+    asm_lgdt((uintptr_t)&gdt_ptr);
 
-    log::puts("GDT successfully installed !\n");
+    log::printf("GDT successfully installed: %#lX %#lX\n",
+                gdt_ptr.base_addr,
+                gdt_ptr.size
+    );
 
     installed = true;
 }

@@ -4,6 +4,7 @@ cmake-build-debug/
 
 disk.iso
 CMakeLists.txt
+log.txt
 
 
 # Prerequisites

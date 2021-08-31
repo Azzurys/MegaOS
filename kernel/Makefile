@@ -36,6 +36,13 @@ INTERNALCXXFLAGS  :=       \
 	-mno-red-zone
 
 
+PRINTF_IMPLEMENTATION_DEFINES =          \
+ 	-DPRINTF_DISABLE_SUPPORT_FLOAT       \
+ 	-DPRINTF_DISABLE_SUPPORT_EXPONENTIAL
+
+COMPILER_DEFINES = $(PRINTF_IMPLEMENTATION_DEFINES)
+
+
 # List our .cpp and .asm files
 CXXFILES := $(shell find ./ -type f -name '*.cpp')
 ASMFILES := $(shell find ./ -type f -name '*.asm')
@@ -54,7 +61,7 @@ $(KERNEL): $(OBJ)
 	$(LD) $(OBJ) $(LDFLAGS) $(INTERNALLDFLAGS) -o $@
 
 %.o: %.cpp stivale2.h
-	$(CC) $(CXXFLAGS) $(INTERNALCXXFLAGS) -c $< -o $@
+	$(CC) $(CXXFLAGS) $(INTERNALCXXFLAGS) $(COMPILER_DEFINES) -c $< -o $@
 
 %.o: %.asm
 	$(AS) $(ASMFLAGS) $< -o $@

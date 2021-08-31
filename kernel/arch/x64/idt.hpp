@@ -59,7 +59,7 @@ class IDT
 public:
     static constexpr uint16_t size() { return ENTRY_COUNT * sizeof(idt_entry); }
     static constexpr uint16_t entry_count() { return ENTRY_COUNT; }
-    static void make_entry(uint16_t entry_vec, void* isr, uint8_t flags);
+    static void make_entry(uint16_t entry_vec, uintptr_t isr, uint8_t flags);
     static void install();
 };
 

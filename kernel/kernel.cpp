@@ -85,19 +85,19 @@ extern "C"
     const auto func = get_write_function(boot_info);
     log::init(func);
 
-    log::printf("Mega OS - %s %s\n", boot_info->bootloader_brand, boot_info->bootloader_version);
+    log::printf("Mega OS - %s %s\n\n", boot_info->bootloader_brand, boot_info->bootloader_version);
 
     GDT::install();
     IDT::install();
 
     interrupts::enable();
-    log::puts("Interrupts enabled !\n");
 
-    __asm__ volatile("int $4");
+    log::puts("Interrupts enabled");
 
-    log::puts("Hey\n");
+    __asm__ volatile("int $9");
 
-    while (true);
+    while (true)
+        __asm__ volatile("cli;hlt");
 }
 
 
