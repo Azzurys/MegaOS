@@ -23,9 +23,9 @@ namespace interrupts
     } PACKED;
 
     /* see page 2996 of the Intel SDM */
-    constexpr uint8_t ARCH_DEFINED_COUNT = 32;
+    constexpr uint8_t CPU_EXCEPTION_COUNT = 32;
 
-    const char* const arch_defined_descriptions[ARCH_DEFINED_COUNT] = {
+    const char* const cpu_exception_descriptions[CPU_EXCEPTION_COUNT] = {
             "Divide Error",
             "Debug Exception",
             "NMI Interrupt",
@@ -66,11 +66,59 @@ namespace interrupts
 
     namespace isr
     {
-        /* points to an array of handlers defined in ASM */
-        ASM_DEFINED uintptr_t handlers[];
+        /* We explicitly separate exception interrupts from IRQs */
+        ASM_DEFINED uintptr_t exceptions_handlers[];
+        ASM_DEFINED uintptr_t interrupts_handlers[];
 
-        extern "C"
-        void cpu_exception_handler(interrupt_frame* frame);
+        extern "C" void cpu_exception_handler(interrupt_frame* frame);
+        extern "C" void irq_interrupt_handler(interrupt_frame* frame);
+
+        /*!
+         * @brief install the actual handlers
+         */
+        void install();
+    }
+
+    namespace pic
+    {
+        enum ports : uint16_t
+        {
+            /* Master / Slave controll ports */
+            MPIC_COMMAND = 0x20,
+            SPIC_COMMAND = 0xA0,
+
+            /* Master / Slave data ports */
+            MPIC_DATA = 0x21,
+            SPIC_DATA = 0xA1
+        };
+
+        enum commands : uint8_t
+        {
+            INIT = 0x10,    // Initialization command
+            ICW4 = 0x01,    // Give additional info about the environment
+            EOI  = 0x20     // Issued at the end of an IRQ interrupt routine
+        };
+
+        /*!
+         * @brief disable the PIC, useful if we use the processor LAPIC or IOAPIC,
+         *        as we must disable the PIC first
+         */
+        inline void disable();
+
+        void set_irq_mask(uint8_t irq);
+        void clear_irq_mask(uint8_t irq);
+
+        /*!
+         * @brief Remap the interrupts. The PIC uses interrupts 0 - 15 for hardware
+         * interrupts by default, which conflicts with the CPU interrupts.
+         * Therefore the PIC interrupts must be remapped to another interval.
+         *
+         * @param mpic_offset offset for remapped master PIC's vectors
+         * @param spic_offset offset for remapped slave  PIC's vectors
+         */
+        void remap(uint8_t mpic_offset, uint8_t spic_offset);
+
+        inline void send_eoi(uint8_t irq_no);
     }
 }
 

@@ -98,7 +98,7 @@ namespace log
         }
     }
 
-    inline void _putchar(char c)
+    void putchar(char c)
     {
         if (write)
             write(&c, 1);
@@ -113,9 +113,9 @@ namespace log
             return 0;
 
         for (size_t i = 0; string[i] != '\0'; ++i)
-            _putchar(string[i]);
+            putchar(string[i]);
 
-        _putchar('\n');
+        putchar('\n');
 
         return 1;
     }
@@ -154,7 +154,7 @@ namespace log
     }
 
 
-    // internal _putchar wrapper
+    // internal putchar wrapper
     static inline void _out_char(char character, void *buffer, size_t idx, size_t maxlen)
     {
         (void) buffer;
@@ -162,7 +162,7 @@ namespace log
         (void) maxlen;
         if (character)
         {
-            _putchar(character);
+            putchar(character);
         }
     }
 

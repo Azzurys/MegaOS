@@ -60,9 +60,9 @@
         log::printf(format, f->err_code, f->int_no, f->rip,
                     f->cs, f->rflags, f->rsp, f->ss);
 
-        if (f->int_no < interrupts::ARCH_DEFINED_COUNT)
+        if (f->int_no < interrupts::CPU_EXCEPTION_COUNT)
             log::printf("Interrupt description: %s\n",
-                        interrupts::arch_defined_descriptions[f->int_no]);
+                        interrupts::cpu_exception_descriptions[f->int_no]);
     }
 
     kpanic(cause, stack_frame);

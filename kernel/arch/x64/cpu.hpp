@@ -29,7 +29,51 @@ namespace cpu
 
     namespace io
     {
+        inline uint8_t inb(uint16_t port)
+        {
+            uint8_t value;
+            __asm__ volatile ("inb %1, %0" : "=a"(value) : "Nd"(port));
+            return value;
+        }
+        
+        inline uint16_t inw(uint16_t port)
+        {
+            uint16_t value;
+            __asm__ volatile ("inw %1, %0" : "=a"(value) : "Nd"(port));
+            return value;
+        }
+        
+        inline uint32_t inl(uint16_t port)
+        {
+            uint32_t value;
+            __asm__ volatile ("inl %1, %0" : "=a"(value) : "Nd"(port));
+            return value;
+        }
+        
+        inline void outb(uint16_t port, uint8_t value)
+        {
+            __asm__ volatile ("outb %0, %1" ::"a"(value), "Nd"(port));
+        }
+        
+        inline void outw(uint16_t port, uint16_t value)
+        {
+            __asm__ volatile ("outw %0, %1" ::"a"(value), "Nd"(port));
+        }
+        
+        inline void outl(uint16_t port, uint32_t value)
+        {
+            __asm__ volatile ("outl %0, %1" ::"a"(value), "Nd"(port));
+        }
 
+        /*!
+         * @brief IO operation on arbitrary unused port.
+         *        This act like it waits a very small amount of time (1-4 microseconds).
+         *        Mainly used for PIC remapping to let the chip process inputs.
+         */
+        inline void wait()
+        {
+            outb(0x80, 0);
+        }
     }
 }
 

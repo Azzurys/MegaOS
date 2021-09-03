@@ -32,7 +32,7 @@ namespace log
  * This function is declared here only. You have to write your custom implementation somewhere
  * \param character Character to output
  */
-    inline void _putchar(char character);
+    void putchar(char character);
 
 
     int puts(const char* string);

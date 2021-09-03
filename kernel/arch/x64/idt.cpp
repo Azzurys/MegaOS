@@ -26,17 +26,22 @@ void IDT::make_entry(uint16_t entry_vec, uintptr_t isr, uint8_t flags)
 
 void IDT::install()
 {
+    using namespace interrupts;
+
     if (installed)
         return;
 
-    // Interrupts are cleared for the moment
-    // because the IDT is not loaded yet
+    /* Interrupts are cleared for the moment because the IDT is not loaded yet */
 
     constexpr auto type_attr = static_cast<uint8_t>(PRESENT | DPL0 | gate_type::intr32);
 
-    // The 32 first interrupts (0-31) are architecture-defined
-    for (uint16_t vector = 0; vector < interrupts::ARCH_DEFINED_COUNT; ++vector)
-        make_entry(vector, interrupts::isr::handlers[vector], type_attr);
+    isr::install();
+
+    for (uint16_t vector = 0; vector < CPU_EXCEPTION_COUNT; ++vector)
+        make_entry(vector, isr::exceptions_handlers[vector], type_attr);
+
+    for (uint16_t vector = CPU_EXCEPTION_COUNT; vector < 256; ++vector)
+        make_entry(vector, isr::interrupts_handlers[vector - CPU_EXCEPTION_COUNT], type_attr);
 
     idt_register idt_ptr {
         .size = size() - 1,

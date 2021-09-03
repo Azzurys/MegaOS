@@ -1,5 +1,4 @@
 #include <stdint.h>
-#include <stddef.h>
 
 #include <stivale2.h>
 #include <logging.hpp>
@@ -90,14 +89,22 @@ extern "C"
     GDT::install();
     IDT::install();
 
-    interrupts::enable();
 
+    // remap master PIC and slave PIC to avoid conflict between IRQ and CPU exceptions.
+    // remap MPIC to start at vector 32 (right after CPU exceptions)
+    // remap SPIC to start at vector 40 (as there is 8 inputs by PIC)
+    constexpr auto mpic_offset = interrupts::CPU_EXCEPTION_COUNT;
+    constexpr auto spic_offset = interrupts::CPU_EXCEPTION_COUNT + 8;
+
+    /* remap master PIC and slave PIC */
+    interrupts::pic::remap(mpic_offset, spic_offset);
+
+    /* the stivale2 boot protocol sets all the irq mask, which make the PIC ignore irqs */
+    interrupts::pic::clear_irq_mask(1);
+    interrupts::enable();
     log::puts("Interrupts enabled");
 
-    __asm__ volatile("int $9");
-
-    while (true)
-        __asm__ volatile("cli;hlt");
+    while (true);
 }
 
 
