@@ -4,7 +4,7 @@
 #include <arch/x64/interrupts.hpp>
 
 
-IDT::idt_entry IDT::table[ENTRY_COUNT] {};
+mkl::array<IDT::idt_entry, IDT::ENTRY_COUNT> IDT::table {};
 bool IDT::installed = false;
 
 
@@ -37,11 +37,11 @@ void IDT::install()
 
     isr::install();
 
-    for (uint16_t vector = 0; vector < CPU_EXCEPTION_COUNT; ++vector)
+    for (uint16_t vector = 0; vector < EXCEPTION_COUNT; ++vector)
         make_entry(vector, isr::exceptions_handlers[vector], type_attr);
 
-    for (uint16_t vector = CPU_EXCEPTION_COUNT; vector < 256; ++vector)
-        make_entry(vector, isr::interrupts_handlers[vector - CPU_EXCEPTION_COUNT], type_attr);
+    for (uint16_t vector = EXCEPTION_COUNT; vector < 256; ++vector)
+        make_entry(vector, isr::interrupts_handlers[vector - EXCEPTION_COUNT], type_attr);
 
     idt_register idt_ptr {
         .size = size() - 1,

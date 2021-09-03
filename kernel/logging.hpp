@@ -36,6 +36,7 @@ namespace log
 
 
     int puts(const char* string);
+    int print(const char* string);
 
 /**
  * Tiny printf implementation
@@ -43,7 +44,7 @@ namespace log
  * To avoid conflicts with the regular printf() API it is overridden by macro defines
  * and internal underscore-appended functions like printf() are used
  * \param format A string that specifies the format of the output
- * \return The number of characters that are written into the array, not counting the terminating null character
+ * \return The number of characters that are written into the elements, not counting the terminating null character
  */
 
     int printf(const char *format, ...);

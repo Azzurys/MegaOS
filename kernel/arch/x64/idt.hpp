@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 #include <utils.hpp>
+#include <mkl/array.hpp>
 
 
 
@@ -53,12 +54,12 @@ class IDT
 
 
     static constexpr uint16_t ENTRY_COUNT = 0x100;
-    static idt_entry table[ENTRY_COUNT];
+    static mkl::array<idt_entry, ENTRY_COUNT> table;
     static bool installed;
 
 public:
-    static constexpr uint16_t size() { return ENTRY_COUNT * sizeof(idt_entry); }
-    static constexpr uint16_t entry_count() { return ENTRY_COUNT; }
+    static constexpr uint16_t size() { return entry_count() * sizeof(idt_entry); }
+    static constexpr uint16_t entry_count() { return table.size(); }
     static void make_entry(uint16_t entry_vec, uintptr_t isr, uint8_t flags);
     static void install();
 };

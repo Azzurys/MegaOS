@@ -2,12 +2,12 @@
 #include <arch/x64/gdt.hpp>
 
 
-GDT::gdt_entry GDT::table[ENTRY_COUNT] {};
+mkl::array<GDT::gdt_entry, GDT::ENTRY_COUNT> GDT::table {};
 bool GDT::installed = false;
 
 void GDT::make_entry(gdt_entry_vec entry_index, uint8_t access, uint8_t flags, uint16_t limit)
 {
-    if (entry_index >= ENTRY_COUNT)
+    if (entry_index >= table.size())
         return;
 
     auto& entry = table[entry_index];

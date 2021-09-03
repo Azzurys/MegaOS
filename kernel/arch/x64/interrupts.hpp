@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <utils.hpp>
 #include <logging.hpp>
+#include <mkl/array.hpp>
 #include <arch/x64/cpu.hpp>
 
 
@@ -23,9 +24,9 @@ namespace interrupts
     } PACKED;
 
     /* see page 2996 of the Intel SDM */
-    constexpr uint8_t CPU_EXCEPTION_COUNT = 32;
+    constexpr uint8_t EXCEPTION_COUNT = 32;
 
-    const char* const cpu_exception_descriptions[CPU_EXCEPTION_COUNT] = {
+    constexpr mkl::array<const char* const, EXCEPTION_COUNT> exception_desc = {
             "Divide Error",
             "Debug Exception",
             "NMI Interrupt",

@@ -7,6 +7,8 @@
 #include <arch/x64/idt.hpp>
 #include <arch/x64/interrupts.hpp>
 
+#include <mkl/array.hpp>
+
 
 constexpr auto KERNEL_STACK_SIZE = 8192u;
 static uint8_t kstack[KERNEL_STACK_SIZE];
@@ -93,8 +95,8 @@ extern "C"
     // remap master PIC and slave PIC to avoid conflict between IRQ and CPU exceptions.
     // remap MPIC to start at vector 32 (right after CPU exceptions)
     // remap SPIC to start at vector 40 (as there is 8 inputs by PIC)
-    constexpr auto mpic_offset = interrupts::CPU_EXCEPTION_COUNT;
-    constexpr auto spic_offset = interrupts::CPU_EXCEPTION_COUNT + 8;
+    constexpr auto mpic_offset = interrupts::EXCEPTION_COUNT;
+    constexpr auto spic_offset = interrupts::EXCEPTION_COUNT + 8;
 
     /* remap master PIC and slave PIC */
     interrupts::pic::remap(mpic_offset, spic_offset);

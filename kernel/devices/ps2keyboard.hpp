@@ -2,6 +2,7 @@
 #define MEGAOS_PS2KEYBOARD_HPP
 
 
+#include <mkl/array.hpp>
 #include <arch/x64/interrupts.hpp>
 
 
@@ -13,17 +14,17 @@ namespace ps2::keyboard
         static void irq_handler([[maybe_unused]] interrupts::interrupt_frame* frame);
 
     private:
-        static bool key_up;
+        static uint8_t key_up;
 
-        static constexpr char kmap_lower[58] {
+        static constexpr mkl::array<char, 58> kmap_lower {
             '\0', '\0', '&', '\0', '"',  '\'', '(', '-',  '\0', '_', '\0', '\0',
             ')', '=', '\b', '\t', 'a',  'z', 'e', 'r',  't', 'y', 'u', 'i',
             'o', 'p', '^', '$', '\0',  '\0', 'q', 's',  'd', 'f', 'g', 'h',
-            'j', 'k', 'l', 'm', '\0', '`', '\0', '*', 'W', 'x', 'c', 'v',
+            'j', 'k', 'l', 'm', '\0', '`', '\0', '*', 'w', 'x', 'c', 'v',
             'b', 'n', ',', ';', ':',  '!', '\0', '\0', '\0', ' '
         };
 
-        static constexpr char kmap_upper[58] {
+        static constexpr mkl::array<char, 58> kmap_upper {
             '\0', '\e', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
             '\0', '+', '\b', '\t', 'A', 'Z', 'E', 'R', 'T', 'Y', 'U', 'I',
             'O', 'P', '\0', '}', '\0', '\0', 'Q', 'S', 'D', 'F', 'G', 'H',

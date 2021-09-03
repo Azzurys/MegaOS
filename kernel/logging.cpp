@@ -120,6 +120,19 @@ namespace log
         return 1;
     }
 
+    int print(const char* string)
+    {
+        if (!write)
+            return -1;
+
+        if (!string)
+            return 0;
+
+        for (size_t i = 0; string[i] != '\0'; ++i)
+            putchar(string[i]);
+
+        return 1;
+    }
 
     // output function type
     typedef void (*out_fct_type)(char character, void *buffer, size_t idx, size_t maxlen);

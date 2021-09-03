@@ -45,7 +45,7 @@ namespace interrupts
             reserved     // serves as a place holder for reserved ints
         };
 
-        static class_type int_type_lut[CPU_EXCEPTION_COUNT] = {
+        static class_type int_type_lut[EXCEPTION_COUNT] = {
                 class_type::fault,
                 class_type::fault,
                 class_type::interrupt,
@@ -91,7 +91,7 @@ namespace interrupts
          */
         inline bool is_cpu_exception(uint64_t int_no)
         {
-            return int_no < CPU_EXCEPTION_COUNT;
+            return int_no < EXCEPTION_COUNT;
         }
 
         /*!
@@ -100,11 +100,11 @@ namespace interrupts
          */
         inline bool is_irq_interrupt(uint64_t int_no)
         {
-            return int_no >= CPU_EXCEPTION_COUNT && int_no < 256;
+            return int_no >= EXCEPTION_COUNT && int_no < 256;
         }
 
         using handler_function = void (*)(interrupt_frame*);
-        handler_function handlers[255];
+        mkl::array<handler_function, 255> handlers;
 
         void install()
         {
@@ -203,7 +203,7 @@ namespace interrupts
 
             const uint8_t icw3 = (command_port == ports::MPIC_COMMAND) ? 0x4 : 0x2;
 
-            /* Start initialization sequence of the PIC, after this command, the PIC will expect 3 bytes */
+            /* Start initialization elements of the PIC, after this command, the PIC will expect 3 bytes */
             cpu::io::outb(command_port, INIT | ICW4); cpu::io::wait();
 
             cpu::io::outb(data_port, pic_offset); cpu::io::wait();  // Vector offset byte

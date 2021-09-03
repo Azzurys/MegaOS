@@ -21,6 +21,7 @@ INTERNALLDFLAGS :=         \
 
 INTERNALCXXFLAGS  :=       \
 	-I.                    \
+	-I../                  \
 	-ggdb                  \
 	-ffreestanding         \
 	-fno-stack-protector   \

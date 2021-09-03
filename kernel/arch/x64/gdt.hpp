@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 #include <utils.hpp>
+#include <mkl/array.hpp>
 
 
 
@@ -77,13 +78,14 @@ class GDT
     };
 
     static constexpr uint8_t ENTRY_COUNT = 7;
-    static gdt_entry table[ENTRY_COUNT];
+    static mkl::array<gdt_entry, ENTRY_COUNT> table;
     static bool installed;
 
 public:
-    static constexpr uint16_t size() { return ENTRY_COUNT * sizeof(gdt_entry); }
-    static constexpr uint8_t entry_count() { return ENTRY_COUNT; };
-    static constexpr uint8_t kernel_cs() { return gdt_entry_vec::_64BIT_CS * sizeof(gdt_entry); }
+    static constexpr uint16_t size() { return entry_count() * sizeof(gdt_entry); }
+    static constexpr uint8_t entry_count() { return table.size(); };
+    static constexpr uint8_t get_selector(gdt_entry_vec vec) { return vec * sizeof(gdt_entry); }
+    static constexpr uint8_t kernel_cs() { return get_selector(_64BIT_CS); }
 
     static void install();
 
