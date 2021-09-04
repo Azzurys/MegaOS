@@ -1,8 +1,10 @@
 limine/
 cmake-build-debug/
+.xmake/
 .idea/
+build/
+iso_root/
 
-disk.iso
 CMakeLists.txt
 log.txt
 

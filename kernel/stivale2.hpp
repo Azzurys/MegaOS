@@ -1,5 +1,5 @@
-#ifndef __STIVALE__STIVALE2_H__
-#define __STIVALE__STIVALE2_H__
+#ifndef STIVALE__STIVALE2_HPP
+#define STIVALE__STIVALE2_HPP
 
 #include <stdint.h>
 
