@@ -1,6 +1,6 @@
 #include <stdint.h>
 
-#include <stivale2.h>
+#include <stivale2.hpp>
 #include <logging.hpp>
 
 #include <arch/x64/gdt.hpp>

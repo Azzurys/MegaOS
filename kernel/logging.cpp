@@ -1,5 +1,4 @@
 #include <stdint.h>
-#include <stdbool.h>
 #include <logging.hpp>
 
 
@@ -65,6 +64,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // internal flag definitions
+
 #define FLAGS_ZEROPAD   (1U <<  0U)
 #define FLAGS_LEFT      (1U <<  1U)
 #define FLAGS_PLUS      (1U <<  2U)
