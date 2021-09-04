@@ -61,7 +61,7 @@ stivale2.h:
 $(KERNEL): $(OBJ)
 	$(LD) $(OBJ) $(LDFLAGS) $(INTERNALLDFLAGS) -o $@
 
-%.o: %.cpp stivale2.h
+%.o: %.cpp stivale2.hpp
 	$(CC) $(CXXFLAGS) $(INTERNALCXXFLAGS) $(COMPILER_DEFINES) -c $< -o $@
 
 %.o: %.asm
