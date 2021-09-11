@@ -2,8 +2,8 @@
 #define MEGAOS_PANIC_HPP
 
 
-#include <arch/x64/cpu.hpp>
-#include <arch/x64/interrupts.hpp>
+#include <arch/x86_64/cpu.hpp>
+#include <arch/x86_64/interrupts.hpp>
 
 
 [[noreturn]] void kpanic(const char* cause);

@@ -1,6 +1,5 @@
 #include <devices/ps2keyboard.hpp>
-#include <arch/x64/interrupts.hpp>
-#include <arch/x64/cpu.hpp>
+#include <arch/x86_64/interrupts.hpp>
 #include <panic.hpp>
 
 

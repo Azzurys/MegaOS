@@ -3,10 +3,10 @@
 #include <stivale2.hpp>
 #include <logging.hpp>
 
-#include <arch/x64/cpu.hpp>
-#include <arch/x64/gdt.hpp>
-#include <arch/x64/idt.hpp>
-#include <arch/x64/interrupts.hpp>
+#include <arch/x86_64/cpu.hpp>
+#include <arch/x86_64/gdt.hpp>
+#include <arch/x86_64/idt.hpp>
+#include <arch/x86_64/interrupts.hpp>
 
 #include <mkl/array.hpp>
 

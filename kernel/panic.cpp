@@ -1,4 +1,4 @@
-#include <arch/x64/cpu.hpp>
+#include <arch/x86_64/cpu.hpp>
 #include <panic.hpp>
 #include <logging.hpp>
 

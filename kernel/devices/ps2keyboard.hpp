@@ -3,7 +3,7 @@
 
 
 #include <mkl/array.hpp>
-#include <arch/x64/interrupts.hpp>
+#include <arch/x86_64/interrupts.hpp>
 
 
 namespace ps2::keyboard

@@ -1,5 +1,5 @@
 #include <devices/ps2keyboard.hpp>
-#include <arch/x64/cpu.hpp>
+#include <arch/x86_64/cpu.hpp>
 #include <logging.hpp>
 
 

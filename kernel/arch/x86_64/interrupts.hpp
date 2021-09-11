@@ -6,7 +6,7 @@
 #include <utils.hpp>
 #include <logging.hpp>
 #include <mkl/array.hpp>
-#include <arch/x64/cpu.hpp>
+#include <arch/x86_64/cpu.hpp>
 
 
 namespace interrupts

@@ -1,7 +1,7 @@
 #include <logging.hpp>
-#include <arch/x64/idt.hpp>
-#include <arch/x64/gdt.hpp>
-#include <arch/x64/interrupts.hpp>
+#include <arch/x86_64/idt.hpp>
+#include <arch/x86_64/gdt.hpp>
+#include <arch/x86_64/interrupts.hpp>
 
 
 mkl::array<IDT::idt_entry, IDT::ENTRY_COUNT> IDT::table {};

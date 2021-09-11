@@ -1,5 +1,5 @@
 #include <logging.hpp>
-#include <arch/x64/gdt.hpp>
+#include <arch/x86_64/gdt.hpp>
 
 
 mkl::array<GDT::gdt_entry, GDT::ENTRY_COUNT> GDT::table {};
