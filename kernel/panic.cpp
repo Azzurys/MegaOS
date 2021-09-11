@@ -1,3 +1,4 @@
+#include <arch/x64/cpu.hpp>
 #include <panic.hpp>
 #include <logging.hpp>
 
@@ -5,9 +6,7 @@
 [[noreturn]] void kpanic(const char* cause)
 {
     log::printf("KERNEL PANIC: %s\n", cause);
-
-    while (true)
-        __asm__ volatile("cli;hlt");
+    cpu::halt();
 }
 
 [[noreturn]] void kpanic(const char* cause, cpu::registers* r)

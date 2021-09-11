@@ -3,6 +3,7 @@
 #include <stivale2.hpp>
 #include <logging.hpp>
 
+#include <arch/x64/cpu.hpp>
 #include <arch/x64/gdt.hpp>
 #include <arch/x64/idt.hpp>
 #include <arch/x64/interrupts.hpp>
@@ -10,8 +11,7 @@
 #include <mkl/array.hpp>
 
 
-constexpr auto KERNEL_STACK_SIZE = 8192u;
-static uint8_t kstack[KERNEL_STACK_SIZE];
+static mkl::array<uint8_t, 8192> kstack;
 
 
 static stivale2_header_tag_terminal
@@ -41,17 +41,11 @@ framebuffer_header_tag {
 __attribute__((section(".stivale2hdr"), used))
 static stivale2_header st2_header {
     .entry_point = 0,
-    .stack = (uintptr_t)kstack + KERNEL_STACK_SIZE,
+    .stack = (uintptr_t)kstack.data() + kstack.size(),
     .flags = 0b110,
     .tags = (uintptr_t)&framebuffer_header_tag,
 };
 
-
-[[noreturn]] void halt()
-{
-    for (;;)
-        __asm__("hlt");
-}
 
 template<typename TagType>
 TagType* st2_get_tag(stivale2_struct* st2_struct, uint64_t tag_id)
@@ -75,7 +69,7 @@ log::TTYWriteFunction get_write_function(stivale2_struct* boot_info)
     const auto term_tag = st2_get_tag<stivale2_struct_tag_terminal>(boot_info, STIVALE2_STRUCT_TAG_TERMINAL_ID);
 
     if (term_tag == nullptr)
-        halt();
+        cpu::halt();
 
     return reinterpret_cast<log::TTYWriteFunction>((void*)term_tag->term_write);
 }

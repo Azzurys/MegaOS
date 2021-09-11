@@ -27,6 +27,13 @@ namespace cpu
         uint64_t rax;
     } PACKED;
 
+    [[noreturn]] inline void halt()
+    {
+        for (;;)
+            __asm__ volatile("cli;hlt");
+    }
+
+
     namespace io
     {
         inline uint8_t inb(uint16_t port)
