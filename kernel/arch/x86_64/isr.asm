@@ -60,8 +60,8 @@ exception_handler%+%1:
 
 %macro make_irq_handler 1
 interrupt_handler%+%1:
-    push qword 0
     push qword %1
+    push qword 0
     jmp handle_irq_common
 %endmacro
 
@@ -99,10 +99,14 @@ handle_isr_common:
 ; same as above but calls the irq handler
 handle_irq_common:
     cld
+
     pusha64
+
     mov rdi, rsp
     call irq_interrupt_handler
+
     popa64
+
     add rsp, 16
     iretq
 

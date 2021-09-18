@@ -14,8 +14,8 @@ namespace interrupts
     struct interrupt_frame
     {
         cpu::registers GPRs;
-        uint64_t int_no;
         uint64_t err_code;
+        uint64_t int_no;
         uint64_t rip;
         uint64_t cs;
         uint64_t rflags;
