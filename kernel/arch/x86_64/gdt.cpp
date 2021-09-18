@@ -52,9 +52,9 @@ void GDT::install()
 
     asm_lgdt((uintptr_t)&gdt_ptr);
 
-    log::printf("GDT successfully installed: %#lX %#lX\n",
-                gdt_ptr.base_addr,
-                gdt_ptr.size
+    log::dprintf("GDT successfully installed: %#lX %#lX\n",
+                 gdt_ptr.base_addr,
+                 gdt_ptr.size
     );
 
     installed = true;

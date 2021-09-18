@@ -112,7 +112,7 @@ namespace interrupts
 
             handlers[33] = ps2::keyboard::controller::irq_handler;
 
-            log::puts("ISR successfully installed");
+            log::dputs("ISR successfully installed");
         }
 
         extern "C"
@@ -152,7 +152,7 @@ namespace interrupts
             if (handlers[frame->int_no])
                 handlers[frame->int_no](frame);
             else
-                log::printf("IRQ %d received but has no handler\n", frame->int_no);
+                log::dprintf("IRQ %d received but has no handler\n", frame->int_no);
 
             pic::send_eoi(frame->int_no);
         }
@@ -216,7 +216,7 @@ namespace interrupts
             remap_pic(ports::MPIC_COMMAND, ports::MPIC_DATA, mpic_offset);
             remap_pic(ports::SPIC_COMMAND, ports::SPIC_DATA, spic_offset);
 
-            log::printf("PIC remapped: PIC1 -> %d | PIC2 -> %d\n", mpic_offset, spic_offset);
+            log::dprintf("PIC remapped: PIC1 -> %d | PIC2 -> %d\n", mpic_offset, spic_offset);
         }
 
         inline void send_eoi(uint8_t irq_no)

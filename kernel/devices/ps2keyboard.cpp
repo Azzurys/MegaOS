@@ -22,9 +22,9 @@ namespace ps2::keyboard
             case 0xAA: key_up &= 0b10; return;  // left shift released
             case 0x3A: key_up ^= 0b10; return;  // caps lock pressed
 
-            case 0x0E: log::print("\b \b");   return;  // backspace
-            case 0x0F: log::putchar('\t'); return;  // tab
-            case 0x1C: log::putchar('\n'); return;  // newline
+            case 0x0E: log::kprint("\b \b");   return;  // backspace
+            case 0x0F: log::kputc('\t'); return;  // tab
+            case 0x1C: log::kputc('\n'); return;  // newline
 
             default: break;
         }
@@ -32,7 +32,7 @@ namespace ps2::keyboard
         if (code < 58)
         {
             const auto& kmap = key_up ? kmap_upper : kmap_lower;
-            log::putchar(kmap[code]);
+            log::kputc(kmap[code]);
         }
     }
 }

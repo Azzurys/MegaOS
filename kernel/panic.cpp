@@ -5,7 +5,8 @@
 
 [[noreturn]] void kpanic(const char* cause)
 {
-    log::printf("KERNEL PANIC: %s\n", cause);
+    log::kputs(RED "KERNEL PANIC OCCURED, CHECK LOGS ON HOST MACHINE !");
+    log::dprintf(RED "KERNEL PANIC: %s\n", cause);
     cpu::halt();
 }
 
@@ -30,10 +31,10 @@
             "\t- r14 = %#lX\n"
             "\t- r15 = %#lX\n\n";
 
-        log::printf(format,
-                    r->rax, r->rbx, r->rcx, r->rdx,
-                    r->rbp, r->rdi, r->rsi, r->r8, r->r9,
-                    r->r10, r->r11, r->r12, r->r13, r->r14, r->r15);
+        log::dprintf(format,
+                     r->rax, r->rbx, r->rcx, r->rdx,
+                     r->rbp, r->rdi, r->rsi, r->r8, r->r9,
+                     r->r10, r->r11, r->r12, r->r13, r->r14, r->r15);
     }
 
     kpanic(cause);
@@ -56,12 +57,12 @@
                              "\t- rsp      = %#lX\n"
                              "\t- ss       = %#lX\n\n";
 
-        log::printf(format, f->err_code, f->int_no, f->rip,
-                    f->cs, f->rflags, f->rsp, f->ss);
+        log::dprintf(format, f->err_code, f->int_no, f->rip,
+                     f->cs, f->rflags, f->rsp, f->ss);
 
         if (f->int_no < interrupts::EXCEPTION_COUNT)
-            log::printf("Interrupt description: %s\n",
-                        interrupts::exception_desc[f->int_no]);
+            log::dprintf("Interrupt description: %s\n",
+                         interrupts::exception_desc[f->int_no]);
     }
 
     kpanic(cause, stack_frame);

@@ -54,15 +54,10 @@ extern "C"
     if (!boot_info)
         cpu::halt();
 
-#if defined(USE_SERIAL_LOGGING)
-    if (!log::init())
-        cpu::halt();
-#else
     if (!log::init(boot_info))
         cpu::halt();
-#endif
 
-    log::printf("Mega OS - %s %s\n\n", boot_info->bootloader_brand, boot_info->bootloader_version);
+    log::kprintf("Mega OS - %s %s\n\n", boot_info->bootloader_brand, boot_info->bootloader_version);
 
     GDT::install();
     IDT::install();
@@ -80,7 +75,7 @@ extern "C"
     /* the stivale2 boot protocol sets all the irq mask, which make the PIC ignore irqs */
     interrupts::pic::clear_irq_mask(1);
     interrupts::enable();
-    log::puts("Interrupts enabled");
+    log::dputs("Interrupts enabled");
 
     while (true);
 }

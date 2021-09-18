@@ -1,13 +1,8 @@
 #include <stdint.h>
 #include <logging.hpp>
-#include <arch/x86_64/cpu.hpp>
-
-
-#if defined(USE_SERIAL_LOGGING)
-#include <serial.hpp>
-#else
 #include <stivale2.hpp>
-#endif
+#include <serial.hpp>
+
 
 
 // define this globally (e.g. gcc -DPRINTF_INCLUDE_CONFIG_H ...) to include the
@@ -95,32 +90,31 @@
 
 namespace log
 {
-    TTYWriteFunction write = nullptr;
+    using WriteFunction = void(*)(const char*, size_t);
+    WriteFunction write = nullptr;
+    volatile bool use_serial = false;
 
-#if defined(USE_SERIAL_LOGGING)
-    bool init()
-    {
-        if (!serial::init())
-            return false;
+    using OutCharFunction = void(*)(const char);
+    OutCharFunction out_char_funcs[2] = { kputc, dputc };
 
-        if (!write)
-            write = serial::send;
+    // true is guaranteed by the standard to be 1, no overflow
+#define putchar(c) out_char_funcs[use_serial](c)
 
-        return true;
-    }
-#else
-    log::TTYWriteFunction get_write_function(st2::st2_struct* boot_info)
+    log::WriteFunction get_write_function(st2::st2_struct* boot_info)
     {
         const auto term_tag = st2::get_tag<st2::struct_tag_terminal>(boot_info, STIVALE2_STRUCT_TAG_TERMINAL_ID);
 
         if (term_tag == nullptr)
             return nullptr;
 
-        return reinterpret_cast<log::TTYWriteFunction>((void*)term_tag->term_write);
+        return reinterpret_cast<log::WriteFunction>((void*)term_tag->term_write);
     }
 
     bool init(st2::st2_struct* boot_info)
     {
+        if (!serial::init())
+            return false;
+
         if (write)
             return false;
 
@@ -132,23 +126,29 @@ namespace log
 
         return false;
     }
-#endif
 
-    void putchar(char c)
+    void dputc(char c)
     {
-        // TODO: Add assertions
-
-#if defined(USE_SERIAL_LOGGING)
-        write(c);
-
         if (c == '\n')
-            write('\r');
-#else
+            serial::send('\r');
+
+        serial::send(c);
+    }
+    
+    void kputc(char c)
+    {
         write(&c, 1);
-#endif
+    }
+    
+    int dputs(const char* string)
+    {
+        use_serial = true;
+        const int ret = kputs(string);
+        use_serial = false;
+        return ret;
     }
 
-    int puts(const char* string)
+    int kputs(const char* string)
     {
         if (!string)
             return 0;
@@ -161,7 +161,15 @@ namespace log
         return 1;
     }
 
-    int print(const char* string)
+    int dprint(const char* string)
+    {
+        use_serial = true;
+        const int ret = kprint(string);
+        use_serial = false;
+        return ret;
+    }
+
+    int kprint(const char* string)
     {
         if (!string)
             return 0;
@@ -1068,7 +1076,22 @@ namespace log
 
 ///////////////////////////////////////////////////////////////////////////////
 
-    int printf(const char *format, ...)
+    int dprintf(const char* format, ...)
+    {
+        use_serial = true;
+
+        va_list va;
+        va_start(va, format);
+        char buffer[1];
+        const int ret = _vsnprintf(_out_char, buffer, (size_t) -1, format, va);
+        va_end(va);
+
+        use_serial = false;
+
+        return ret;
+    }
+
+    int kprintf(const char* format, ...)
     {
         va_list va;
         va_start(va, format);

@@ -66,8 +66,6 @@ target("MegaOS")
     if is_mode("debug") then
         add_cxxflags("-ggdb", {force = true})
         add_asflags("-F dwarf -g", {force = true})
-    else
-        add_defines("USE_SERIAL_LOGGING")
     end
 
     before_run(

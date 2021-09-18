@@ -18,40 +18,24 @@ extern "C" {
      * in '0x' uppercase when using the hash flag.
      */
 
+#define RED "\033[31m"
 
 namespace log
 {
-#if defined(USE_SERIAL_LOGGING)
-        using TTYWriteFunction = void(*)(char);
-        bool init();
-#else
-        using TTYWriteFunction = void(*)(const char*, size_t);
-        bool init(st2::st2_struct* boot_info);
-#endif
+    /* initialize logging and serial communication */
+    bool init(st2::st2_struct* boot_info);
 
+    /* print to kernel's terminal */
+    void kputc(char c);
+    int  kputs(const char* string);
+    int  kprint(const char* string);
+    int  kprintf(const char *format, ...);
 
-/**
- * Output a character to a custom device like UART, used by the printf() function
- * This function is declared here only. You have to write your custom implementation somewhere
- * \param character Character to output
- */
-    void putchar(char c);
-
-
-    int puts(const char* string);
-    int print(const char* string);
-
-/**
- * Tiny printf implementation
- * You have to implement _putchar if you use printf()
- * To avoid conflicts with the regular printf() API it is overridden by macro defines
- * and internal underscore-appended functions like printf() are used
- * \param format A string that specifies the format of the output
- * \return The number of characters that are written into the elements, not counting the terminating null character
- */
-
-    int printf(const char *format, ...);
-
+    /* print to host's terminal via serial communication */
+    void dputc(char c);
+    int  dputs(const char* string);
+    int  dprint(const char* string);
+    int  dprintf(const char *format, ...);
 
 /**
  * Tiny sprintf implementation
@@ -90,8 +74,8 @@ namespace log
 
 
 /**
- * printf with output function
- * You may use this as dynamic alternative to printf() with its fixed _putchar() output
+ * kprintf with output function
+ * You may use this as dynamic alternative to kprintf() with its fixed _putchar() output
  * \param out An output function which takes one character and an argument pointer
  * \param arg An argument pointer for user data passed to output function
  * \param format A string that specifies the format of the output

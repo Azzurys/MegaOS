@@ -52,8 +52,8 @@ void IDT::install()
 
     installed = true;
 
-    log::printf("IDT successfully installed: %#lX %#lX\n",
-                idt_ptr.base_addr,
-                idt_ptr.size
+    log::dprintf("IDT successfully installed: %#lX %#lX\n",
+                 idt_ptr.base_addr,
+                 idt_ptr.size
     );
 }
