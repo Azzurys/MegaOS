@@ -1,5 +1,13 @@
 #include <stdint.h>
 #include <logging.hpp>
+#include <arch/x86_64/cpu.hpp>
+
+
+#if defined(USE_SERIAL_LOGGING)
+#include <serial.hpp>
+#else
+#include <stivale2.hpp>
+#endif
 
 
 // define this globally (e.g. gcc -DPRINTF_INCLUDE_CONFIG_H ...) to include the
@@ -87,28 +95,61 @@
 
 namespace log
 {
-    namespace
-    {
-        TTYWriteFunction write = nullptr;
+    TTYWriteFunction write = nullptr;
 
-        void init(TTYWriteFunction log_function)
-        {
-            if (!write)
-                write = log_function;
-        }
+#if defined(USE_SERIAL_LOGGING)
+    bool init()
+    {
+        if (!serial::init())
+            return false;
+
+        if (!write)
+            write = serial::send;
+
+        return true;
     }
+#else
+    log::TTYWriteFunction get_write_function(st2::st2_struct* boot_info)
+    {
+        const auto term_tag = st2::get_tag<st2::struct_tag_terminal>(boot_info, STIVALE2_STRUCT_TAG_TERMINAL_ID);
+
+        if (term_tag == nullptr)
+            return nullptr;
+
+        return reinterpret_cast<log::TTYWriteFunction>((void*)term_tag->term_write);
+    }
+
+    bool init(st2::st2_struct* boot_info)
+    {
+        if (write)
+            return false;
+
+        if (auto f = get_write_function(boot_info))
+        {
+            write = f;
+            return true;
+        }
+
+        return false;
+    }
+#endif
 
     void putchar(char c)
     {
-        if (write)
-            write(&c, 1);
+        // TODO: Add assertions
+
+#if defined(USE_SERIAL_LOGGING)
+        write(c);
+
+        if (c == '\n')
+            write('\r');
+#else
+        write(&c, 1);
+#endif
     }
 
     int puts(const char* string)
     {
-        if (!write)
-            return -1;
-
         if (!string)
             return 0;
 
@@ -122,9 +163,6 @@ namespace log
 
     int print(const char* string)
     {
-        if (!write)
-            return -1;
-
         if (!string)
             return 0;
 

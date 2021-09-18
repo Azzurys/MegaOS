@@ -1,6 +1,7 @@
 #include <stdint.h>
 
 #include <stivale2.hpp>
+
 #include <logging.hpp>
 
 #include <arch/x86_64/cpu.hpp>
@@ -14,7 +15,7 @@
 static mkl::array<uint8_t, 8192> kstack;
 
 
-static stivale2_header_tag_terminal
+static st2::header_tag_terminal
 terminal_header_tag {
     .tag = {
             .identifier = STIVALE2_HEADER_TAG_TERMINAL_ID,
@@ -24,7 +25,7 @@ terminal_header_tag {
 };
 
 
-static stivale2_header_tag_framebuffer
+static st2::header_tag_framebuffer
 framebuffer_header_tag {
     .tag = {
             .identifier = STIVALE2_HEADER_TAG_FRAMEBUFFER_ID,
@@ -39,7 +40,7 @@ framebuffer_header_tag {
 
 
 __attribute__((section(".stivale2hdr"), used))
-static stivale2_header st2_header {
+static st2::header st2_header {
     .entry_point = 0,
     .stack = (uintptr_t)kstack.data() + kstack.size(),
     .flags = 0b110,
@@ -47,38 +48,19 @@ static stivale2_header st2_header {
 };
 
 
-template<typename TagType>
-TagType* st2_get_tag(stivale2_struct* st2_struct, uint64_t tag_id)
+extern "C"
+[[noreturn]] void _start(st2::st2_struct* boot_info)
 {
-    auto curr_tag = reinterpret_cast<stivale2_tag*>(st2_struct->tags);
-
-    for (;;)
-    {
-        if (curr_tag == nullptr)
-            return nullptr;
-
-        if (curr_tag->identifier == tag_id)
-            return reinterpret_cast<TagType*>(curr_tag);
-
-        curr_tag = reinterpret_cast<stivale2_tag*>(curr_tag->next);
-    }
-}
-
-log::TTYWriteFunction get_write_function(stivale2_struct* boot_info)
-{
-    const auto term_tag = st2_get_tag<stivale2_struct_tag_terminal>(boot_info, STIVALE2_STRUCT_TAG_TERMINAL_ID);
-
-    if (term_tag == nullptr)
+    if (!boot_info)
         cpu::halt();
 
-    return reinterpret_cast<log::TTYWriteFunction>((void*)term_tag->term_write);
-}
-
-extern "C"
-[[noreturn]] void _start(stivale2_struct* boot_info)
-{
-    const auto func = get_write_function(boot_info);
-    log::init(func);
+#if defined(USE_SERIAL_LOGGING)
+    if (!log::init())
+        cpu::halt();
+#else
+    if (!log::init(boot_info))
+        cpu::halt();
+#endif
 
     log::printf("Mega OS - %s %s\n\n", boot_info->bootloader_brand, boot_info->bootloader_version);
 

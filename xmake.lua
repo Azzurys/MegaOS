@@ -66,6 +66,8 @@ target("MegaOS")
     if is_mode("debug") then
         add_cxxflags("-ggdb", {force = true})
         add_asflags("-F dwarf -g", {force = true})
+    else
+        add_defines("USE_SERIAL_LOGGING")
     end
 
     after_build(
@@ -90,7 +92,7 @@ target("MegaOS")
 
         if is_mode("debug") then
             local proc1 = process.open(
-                "qemu-system-x86_64 -M q35,smm=off -m 1G -cdrom build/disk.iso -s -S -d int -no-reboot -no-shutdown",
+                "qemu-system-x86_64 -M q35,smm=off -m 256M -cdrom build/disk.iso -s -S -d int -no-reboot -no-shutdown",
                 { stderr="log.txt" }
             )
 
@@ -104,7 +106,7 @@ target("MegaOS")
             proc1:wait()
             proc2:wait()
         else
-            os.run("qemu-system-x86_64 -M q35,smm=off -m 1G -cdrom build/disk.iso -no-reboot -no-shutdown")
+            os.exec("qemu-system-x86_64 -M q35,smm=off -m 256M -cdrom build/disk.iso -no-reboot -no-shutdown -serial stdio")
         end
     end
     )

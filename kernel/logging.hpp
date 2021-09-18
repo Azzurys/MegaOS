@@ -4,6 +4,7 @@
 
 #include <stdarg.h>
 #include <stddef.h>
+#include <stivale2.hpp>
 
 
 #ifdef __cplusplus
@@ -20,19 +21,21 @@ extern "C" {
 
 namespace log
 {
-    namespace
-    {
+#if defined(USE_SERIAL_LOGGING)
+        using TTYWriteFunction = void(*)(char);
+        bool init();
+#else
         using TTYWriteFunction = void(*)(const char*, size_t);
+        bool init(st2::st2_struct* boot_info);
+#endif
 
-        void init(TTYWriteFunction log_function);
-    }
 
 /**
  * Output a character to a custom device like UART, used by the printf() function
  * This function is declared here only. You have to write your custom implementation somewhere
  * \param character Character to output
  */
-    void putchar(char character);
+    void putchar(char c);
 
 
     int puts(const char* string);
