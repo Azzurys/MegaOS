@@ -70,19 +70,31 @@ target("MegaOS")
         add_defines("USE_SERIAL_LOGGING")
     end
 
-    after_build(
-    function (target)
-        os.run("rm -rf iso_root")
-        os.run("mkdir -p iso_root")
-        os.run("cp build/MegaOS limine.cfg limine/limine.sys limine/limine-cd.bin limine/limine-eltorito-efi.bin iso_root/")
-    end
-    )
-
     before_run(
     function (target)
+        if not os.isdir("iso_root") then
+            os.mkdir("iso_root")
+        end
+
+        -- clean directory
+        os.rm("iso_root/**")
+
+        local files = {
+            "build/MegaOS", "limine.cfg", "limine/limine.sys",
+            "limine/limine-cd.bin", "limine/limine-eltorito-efi.bin"
+        }
+
+        -- copy files to directory
+        for _, fpath in ipairs(files) do
+            os.cp(fpath, "iso_root/")
+        end
+
+        -- build image
         os.run("xorriso -as mkisofs -b limine-cd.bin -no-emul-boot -boot-load-size 4 -boot-info-table --efi-boot limine-eltorito-efi.bin --efi-boot-part --efi-boot-image --protective-msdos-label iso_root -o build/disk.iso")
         os.run("limine/limine-install build/disk.iso")
-        os.run("rm -rf iso_root")
+
+        -- remove temporary files
+        os.rm("iso_root/**")
     end
     )
 
@@ -114,5 +126,6 @@ target("MegaOS")
     after_clean(
     function (target)
         os.rm("build/disk.iso")
+        os.rmdir("iso_root")
     end
     )
