@@ -68,6 +68,10 @@ target("MegaOS")
         add_asflags("-F dwarf -g", {force = true})
     end
 
+    if is_mode("release") then
+        add_defines("MEGA_RELEASE")
+    end
+
     before_run(
     function (target)
         if not os.isdir("iso_root") then

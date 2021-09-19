@@ -3,6 +3,7 @@
 #include <stivale2.hpp>
 
 #include <logging.hpp>
+#include <definitions.hpp>
 
 #include <arch/x86_64/cpu.hpp>
 #include <arch/x86_64/gdt.hpp>
@@ -51,8 +52,7 @@ static st2::header st2_header {
 extern "C"
 [[noreturn]] void _start(st2::st2_struct* boot_info)
 {
-    if (!boot_info)
-        cpu::halt();
+    assert(boot_info);
 
     if (!log::init(boot_info))
         cpu::halt();

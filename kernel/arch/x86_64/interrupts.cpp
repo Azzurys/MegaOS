@@ -1,6 +1,8 @@
 #include <devices/ps2keyboard.hpp>
 #include <arch/x86_64/interrupts.hpp>
+
 #include <panic.hpp>
+#include <definitions.hpp>
 
 
 namespace interrupts
@@ -118,19 +120,16 @@ namespace interrupts
         extern "C"
         void cpu_exception_handler(interrupt_frame* frame)
         {
-            /* should never happen except if you explicitly call it yourself */
-            if (!frame)
-                kpanic("Invalid Pointer to GPRs in CPU exception handler");
-
-            /* should never happen except if you explicitly call it yourself */
-            if (!is_cpu_exception(frame->int_no))
-                kpanic("Not a CPU exception", frame);
+            // should never happen except if you
+            // explicitly call the exception yourself
+            assert(frame);
+            assert(is_cpu_exception(frame->int_no));
 
             // Check if the interrupt is of type abort, if so, kernel panic then halt.
             if (get_class_type(frame->int_no) == class_type::abort)
                 kpanic("CPU interrupt of class abort.", frame);
 
-            // Check if the interrupt has an handler
+            // Check if the interrupt has a handler
             if (handlers[frame->int_no])
                 handlers[frame->int_no](frame);
             else
@@ -140,13 +139,10 @@ namespace interrupts
         extern "C"
         void irq_interrupt_handler(interrupt_frame* frame)
         {
-            /* should never happen except if you explicitly call it yourself */
-            if (!frame)
-                kpanic("Invalid Pointer to GPRs in IRQ interrupt handler");
-
-            /* should never happen except if you explicitly call it yourself */
-            if (!is_irq_interrupt(frame->int_no))
-                kpanic("Not an IRQ interrupt", frame);
+            // should never happen except if you
+            // explicitly call the interrupt handler yourself
+            assert(frame);
+            assert(is_irq_interrupt(frame->int_no));
 
             /* Call the IRQ handler */
             if (handlers[frame->int_no])

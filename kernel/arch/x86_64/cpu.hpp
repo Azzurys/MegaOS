@@ -3,7 +3,7 @@
 
 
 #include <stdint.h>
-#include <utils.hpp>
+#include <definitions.hpp>
 
 
 namespace cpu

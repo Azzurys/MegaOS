@@ -3,9 +3,9 @@
 
 
 #include <stdint.h>
-#include <utils.hpp>
 #include <logging.hpp>
 #include <mkl/array.hpp>
+#include <definitions.hpp>
 #include <arch/x86_64/cpu.hpp>
 
 
